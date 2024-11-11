@@ -1,8 +1,10 @@
 import cirq
 import sympy
 import tensorflow_quantum as tfq
+import yaml
 
-
+with open("config.yaml", "r") as file:
+    config = yaml.safe_load(file)
 
 def cluster_state_circuit(bits):
     circuit = cirq.Circuit()
@@ -87,24 +89,25 @@ def grover_search(bits, symbols, target_state):
     circuit = cirq.Circuit()
     circuit.append(cirq.H.on_each(bits))
 
-    #oracle 
+    #apply oracle to flip phase of target state
     for qubit, state in zip(bits, target_state):
         if state == 0:
             circuit.append(cirq.X(qubit))
 
-    # diffusion operator
-    circuit.append(cirq.H.on_each(bits))
+    #marks target state
+    circuit.append(cirq.Z(bits[-1]).controlled_by(*bits[:-1]))
 
-    for b in bits:
-        circuit.append(cirq.X(b))
-    circuit.append(cirq.H(bits[-1]))
-    circuit.append(cirq.CNOT(bits[0], bits[-1]))
-    circuit.append(cirq.H(bits[-1]))
+    #reverses oracle modifications
+    for qubit,state in zip(bits, target_state):
+        if state ==0:
+            circuit.append(cirq.X(qubit))
 
-    for b in bits:
-        circuit.append(cirq.X(b))
-    circuit.append(c.H.on_each(bits))
-
+    #diffusion operator to amplify results
+    circuit.append(cirq.H(bits[bits]))
+    circuit.append(cirq.X(bits[bits]))
+    circuit.append(cirq.Z(bits[-1]).controlled_by(*bits[:-1]))
+    circuit.append(cirq.X(bits[bits]))
+    circuit.append(cirq.H(bits[bits]))
 
     return circuit
 

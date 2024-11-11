@@ -1,0 +1,22 @@
+output_directory: './results/model_outputs'
+
+# training
+epochs: 50
+batch_size: 128
+learning_rate: 0.001
+optimizer: Adam 
+
+# quantum model 
+quantum_layers: 5
+qubits: 4
+entanglement_type: ZZ
+
+# classic cnn
+cnn_filters: [32,64,128,256]
+cnn_kernel: (3,3)
+cnn_activation: relu
+output_activation: softmax
+
+use_mirrored_strategy: true
+
+logs_path: './results/logs'
