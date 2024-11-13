@@ -1,22 +1,45 @@
 output_directory: './results/model_outputs'
 
-# training
-epochs: 50
-batch_size: 128
-learning_rate: 0.001
-optimizer: Adam 
+quantum_backend:
+  provider: "IBM Quantum Experience"
+  backend_name: "ibmq_qasm_simulator"
+  api_token: 'YOURAPITOKEN'
+  shots: 1024
 
-# quantum model 
-quantum_layers: 5
-qubits: 4
-entanglement_type: ZZ
+hpc_backend: 
+  provider: "IBM HPC"
+  region: "us-east-1"    #this might change idk
+  max_resistance: 5
 
-# classic cnn
-cnn_filters: [32,64,128,256]
-cnn_kernel: (3,3)
-cnn_activation: relu
-output_activation: softmax
+
+cnn_model: 
+  layers: 
+    - type: "conv2d"
+      filters: [32,64,128,256]
+      kernel_size: (3,3)
+      activation: "relu"
+    - type: "maxpooling2d"
+      pool_size: [2,2]      
+    - type: "dense"
+      units: 128
+      activation: "relu"
+  output_activation: softmax
+  learning_rate: 0.001
+  optimizer: "adam"
+        epochs: 50
+
+  output_directory: "./results/model_outputs"
+
+quantum_preprocessing:
+  method: "grover_search"
+  layers: 5
+  num_qubits: 4
+  entanglement_type: ZZ
+
 
 use_mirrored_strategy: true
 
-logs_path: './results/logs'
+logging:  
+  level: "INFO"
+  log_to_file: true
+  logs_file_path: './results/logs/project_log.log'

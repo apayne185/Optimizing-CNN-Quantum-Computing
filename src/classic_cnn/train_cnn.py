@@ -32,7 +32,7 @@ train_w_qcnn = True   #set to false to train classical
 with strategy.scope: 
     if train_w_qcnn:
         bits=[cirq.GridQubit(0,i) for i in range(config['quantum_layers'])]
-        target_state = [1,0,1,0]
+        target_state = [1,0,1,0]    #this gets modified
         symbols = sympy.symbols('x0:12')
         model = build_cnn(bits, target_state, symbols, num_classes= 10)
     else:

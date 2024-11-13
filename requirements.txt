@@ -7,4 +7,7 @@ matplotlib==3.6.2
 pandas==1.5.3
 scipy==1.9.3
 keras==2.11.0
+ibm-cloud-sdk-core==3.10.0
+ibm-hpc-sdk
+
 

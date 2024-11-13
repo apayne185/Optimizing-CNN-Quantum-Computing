@@ -13,15 +13,23 @@ tensorflow-quantum is not compatible with windows, so we need to use WSL (window
 
 
 Scripts
-- ibm_backend.py : handles be logic, interacts with APIs and databases
-- imb_submit.py : contains code to submit jobs to IBM QE for executing a quantum circuit
+- ibm_backend.py : handles Q and HPC be logic, interacts with APIs and databases
+    - needs functions to set up connections to IBMQ be, submit quantum tasks to be, and to track job progress and get results 
+- imb_submit.py : contains code for jobs submission to IBM HPC 
+    - needs functions for submitting the cnn and preprocessing jobs, etc
 
 Results
 - logs/ --> contains logs of experiments, training, runtime (tracks training/testing)
-- model_output/ --> saves trained model weights/predictions/results from evaluation
+    - project_log.log --> consolidates logs from different parts of the project
+    - experiments_logs/ --> we can make this subdirectory if we need it for specific logs 
+
+- model_output/ --> saves serialized trained model weights/predictions/results from evaluation. likely will have the files:
+    - model_{epoch}.h5  --> model checkpoints
+    - metrics.json --> sumamry of model performance metrics for each run
 
 src/Utils 
-- 
+- data_preprocess.py --> 
+
 
 
 https://www.tensorflow.org/quantum/tutorials/qcnn
