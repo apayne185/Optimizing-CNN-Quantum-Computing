@@ -3,8 +3,11 @@ import sympy
 import tensorflow_quantum as tfq
 import yaml
 
+
+
 with open("config.yaml", "r") as file:
     config = yaml.safe_load(file)
+
 
 def cluster_state_circuit(bits):
     circuit = cirq.Circuit()
@@ -48,6 +51,8 @@ def two_qubit_unitary(bits, symbols):
     circuit += one_qubit_unitary(bits[0], symbols[9:12])
     circuit += one_qubit_unitary(bits[1], symbols[12:])  
 
+    return circuit
+
 
 
 
@@ -57,14 +62,12 @@ def two_qubit_unitary(bits, symbols):
 def two_qubit_pool(source_qubit, sink_qubit, symbols):
     pool_circuit = cirq.Circuit()     #empty qcircuit
     #basis selector means 1 qubit unitary transformation/rotation, parameterized by the first 3 symbols
-    sink_basis_selector = one_qubit_unitary(sink_qubit, symbols[0:3])
-    source_basis_selector = one_qubit_unitary(source_qubit, symbols[3:6])
-    pool_circuit.append(sink_basis_selector)
-    pool_circuit.append(source_basis_selector)
+    pool_circuit.append(one_qubit_unitary(sink_qubit, symbols[0:3]))
+    pool_circuit.append(one_qubit_unitary(source_qubit, symbols[3:6]))
     #CNOT creates entanglement
-    pool_circuit.append(cirq.CNOT(source_qubit, sink_qubit))  
+    pool_circuit.append(cirq.CNOT(source_qubit, sink_qubit))
     #basis selector is applied to reverse the effect of the sink_basis_selector --POOLS
-    pool_circuit.append(sink_basis_selector**-1)
+    pool_circuit.append(one_qubit_unitary(sink_qubit, symbols[0:3])**-1)
     return pool_circuit
 
 
@@ -84,7 +87,6 @@ def quantum_conv_circuit(bits, symbols):
 
 
 '''Grovers search w quantum assisted data preprocessing'''
-
 def grover_search(bits, symbols, target_state): 
     circuit = cirq.Circuit()
     circuit.append(cirq.H.on_each(bits))
@@ -103,21 +105,18 @@ def grover_search(bits, symbols, target_state):
             circuit.append(cirq.X(qubit))
 
     #diffusion operator to amplify results
-    circuit.append(cirq.H(bits[bits]))
-    circuit.append(cirq.X(bits[bits]))
+    circuit.append(cirq.H.on_each(bits), cirq.X.on_each(bits))
     circuit.append(cirq.Z(bits[-1]).controlled_by(*bits[:-1]))
-    circuit.append(cirq.X(bits[bits]))
-    circuit.append(cirq.H(bits[bits]))
+    circuit.append(cirq.X.on_each(bits), cirq.H.on_each(bits))
+
 
     return circuit
 
     
 
-
 '''Combination allows hybrid quantum preprocessing layer'''
 def quantum_conv_grover(bits, symbols, target_state):
     circuit = quantum_conv_circuit(bits, target_state)
-    grover_circuit = grover_search(bits, symbols, target_state)
+    circuit += grover_search(bits, symbols, target_state)
 
-    circuit.append(grover_circuit)
     return circuit 

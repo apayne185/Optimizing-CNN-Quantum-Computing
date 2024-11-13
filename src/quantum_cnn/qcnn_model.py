@@ -15,7 +15,7 @@ output_activation = config['output_activation']
 
 class QuantumToClassical(tf.keras.layer.Layer):
     def __init__(self, quantum_layer): 
-        super(QuantumToClassical, self).__init__()
+        super().__init__()
         self.quantum_layer = quantum_layer
 
     def call(self, inputs):
@@ -36,13 +36,11 @@ def build_qcnn(bits, target_state, symbols, num_classes):
     quantum_circuit = quantum_conv_grover(bits, symbols, target_state)
     quantum_layer = tfq.layers.PQC(quantum_circuit, cirq.Z(bits[-1]))
 
-    #conversion layer
-    q_to_c = QuantumToClassical(quantum_layer)
-
     #classical part of model
     model = tf.keras.Sequential([
-        q_to_c, 
-        tf.keras.layers.Dense(num_classes, output_activation)
+        #conversion layer
+        QuantumToClassical(quantum_layer),
+        tf.keras.layers.Dense(num_classes, activation=output_activation)
     ])
 
     return model
